@@ -348,11 +348,13 @@ function! sj#ruby#SplitBlock()
 endfunction
 
 function! sj#ruby#JoinBlock()
-  let do_pattern = '\<do\>\(\s*|.*|\s*\)\?$'
+  let do_pattern = '\<do\>'
 
+  " Search 'do' when on the same line with the block
   let do_line_no = search(do_pattern, 'cW', line('.'))
   if do_line_no <= 0
-    let do_line_no = search(do_pattern, 'bcW', line('.'))
+    " Search the beginning of the block when inside
+    let do_line_no = searchpair(do_pattern, '', '\<end\>', 'cb')
   endif
 
   if do_line_no <= 0
@@ -371,7 +373,8 @@ function! sj#ruby#JoinBlock()
   let lines = sj#GetLines(do_line_no, end_line_no)
   let lines = sj#TrimList(lines)
 
-  let do_line  = substitute(lines[0], do_pattern, '{\1', '')
+  " Considered it more readable than original line because of the '\1'
+  let do_line  = substitute(lines[0], do_pattern.'\(\s*|.*|\s*\)\?$', '{\1', '')
   let body     = join(lines[1:-2], '; ')
   let body     = sj#Trim(body)
   let end_line = substitute(lines[-1], 'end', '}', '')
@@ -383,7 +386,7 @@ function! sj#ruby#JoinBlock()
 
   call sj#ReplaceLines(do_line_no, end_line_no, replacement)
 
-  return 1
+  return s:do_not_restore_cursor
 endfunction
 
 function! sj#ruby#SplitCachingConstruct()

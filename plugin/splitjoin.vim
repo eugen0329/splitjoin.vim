@@ -70,6 +70,12 @@ if g:splitjoin_split_mapping != ''
   exe 'nnoremap <silent> '.g:splitjoin_split_mapping.' :<c-u>call <SID>Mapping(g:splitjoin_split_mapping, "<SID>Split")<cr>'
 endif
 
+" Internal Constants:
+" ===================
+
+" ruby symbol-like magic number wrap
+let s:do_not_restore_cursor = -4
+
 " Internal Functions:
 " ===================
 
@@ -119,7 +125,11 @@ function! s:Join()
       endif
 
     finally
-      call sj#PopCursor()
+      if rval == s:do_not_restore_cursor
+        call sj#PopCursorNoRestore()
+      else
+        call sj#PopCursor()
+      endif
     endtry
   endfor
 
