@@ -74,7 +74,7 @@ endif
 " ===================
 
 " ruby symbol-like magic number wrap
-let s:do_not_restore_cursor = -4
+let g:_sjDoNotRestoreCursor = -4
 
 " Internal Functions:
 " ===================
@@ -119,13 +119,14 @@ function! s:Join()
     try
       call sj#PushCursor()
 
-      if call(callback, [])
+      let rval = call(callback, [])
+      if rval
         silent! call repeat#set("\<plug>SplitjoinJoin")
         return 1
       endif
 
     finally
-      if rval == s:do_not_restore_cursor
+      if rval == g:_sjDoNotRestoreCursor
         call sj#PopCursorNoRestore()
       else
         call sj#PopCursor()
