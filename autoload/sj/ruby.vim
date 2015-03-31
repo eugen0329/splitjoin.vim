@@ -386,9 +386,7 @@ function! sj#ruby#JoinBlock()
 
   call sj#ReplaceLines(do_line_no, end_line_no, replacement)
 
-  "return s:do_not_restore_cursor
-  "return -4
-  return g:_sjDoNotRestoreCursor
+  return g:sjDoNotRestoreCursor
 endfunction
 
 function! sj#ruby#SplitCachingConstruct()

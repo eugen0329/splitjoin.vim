@@ -29,14 +29,6 @@ function! sj#PopCursor()
   call setpos('.', remove(b:cursor_position_stack, -1))
 endfunction
 
-" function! sj#PopCursor() {{{2
-"
-" Removes the position from the stack, but don't restore the cursor to the
-" latest position , as added from the sj#PushCursor function.
-function! sj#PopCursorNoRestore()
-  call remove(b:cursor_position_stack, -1)
-endfunction
-
 
 " function! sj#DropCursor() {{{2
 "

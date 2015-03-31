@@ -74,7 +74,7 @@ endif
 " ===================
 
 " ruby symbol-like magic number wrap
-let g:_sjDoNotRestoreCursor = -4
+let g:sjDoNotRestoreCursor = -4
 
 " Internal Functions:
 " ===================
@@ -126,8 +126,8 @@ function! s:Join()
       endif
 
     finally
-      if rval == g:_sjDoNotRestoreCursor
-        call sj#PopCursorNoRestore()
+      if rval == g:sjDoNotRestoreCursor
+        call sj#DropCursor()
       else
         call sj#PopCursor()
       endif
