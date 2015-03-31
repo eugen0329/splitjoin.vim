@@ -364,12 +364,14 @@ function! sj#ruby#JoinBlock()
   let do_pattern = '\<do\>'
   let after_do = '\(\s*|.*|\s*\)\?$'
   let initial_pos = [line('.'), col('.')]
+  let is_called_inside_block = 0
 
   " Search 'do' when on the same line with the block
   let do_line_no = search(do_pattern, 'cW', line('.'))
   if do_line_no <= 0
     " Search the beginning of the block when inside
-    let do_line_no = searchpair(do_pattern, '', '\<end\>', 'cb')
+    let is_called_inside_block = 1
+    let do_line_no = searchpair(do_pattern, '', '\<end\>', 'bW')
   endif
 
   if do_line_no <= 0
@@ -385,8 +387,10 @@ function! sj#ruby#JoinBlock()
   let do_line_no += offset
   let end_line_no += offset
 
-  let result_curs_col = sj#ruby#JoinedBlockCursorCol(do_line_no, initial_pos)
-  call sj#SetPeekPos(do_line_no, result_curs_col)
+  if is_called_inside_block
+    let result_curs_col = sj#ruby#JoinedBlockCursorCol(do_line_no, initial_pos)
+    call sj#SetPeekPos(do_line_no, result_curs_col)
+  endif
 
   let lines = sj#GetLines(do_line_no, end_line_no)
   let lines = sj#TrimList(lines)
