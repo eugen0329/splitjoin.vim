@@ -347,8 +347,23 @@ function! sj#ruby#SplitBlock()
   return 1
 endfunction
 
+function! sj#ruby#JoinedBlockCursorCol(do_line_no, curs_pos)
+  let lines  =  sj#GetLines(a:do_line_no, a:curs_pos[0])
+  let offset =  strlen(lines[0]) - 1
+  let offset += strlen(sj#Ltrim(lines[-1][: a:curs_pos[1]]))
+
+  for line in sj#TrimList(lines[1:-2])
+    " 2 == strlen('; ')
+    let offset += strlen(line) + 2
+  endfor
+
+  return offset
+endfunction
+
 function! sj#ruby#JoinBlock()
   let do_pattern = '\<do\>'
+  let after_do = '\(\s*|.*|\s*\)\?$'
+  let initial_pos = [line('.'), col('.')]
 
   " Search 'do' when on the same line with the block
   let do_line_no = search(do_pattern, 'cW', line('.'))
@@ -370,6 +385,9 @@ function! sj#ruby#JoinBlock()
   let do_line_no += offset
   let end_line_no += offset
 
+  let result_curs_col = sj#ruby#JoinedBlockCursorCol(do_line_no, initial_pos)
+  call sj#SetPeekPos(do_line_no, result_curs_col)
+
   let lines = sj#GetLines(do_line_no, end_line_no)
   let lines = sj#TrimList(lines)
 
@@ -380,13 +398,11 @@ function! sj#ruby#JoinBlock()
   let end_line = substitute(lines[-1], 'end', '}', '')
 
   let replacement = do_line.' '.body.' '.end_line
-
   " shorthand to_proc if possible
   let replacement = substitute(replacement, '\s*{ |\(\k\+\)| \1\.\(\k\+[!?]\=\) }$', '(\&:\2)', '')
-
   call sj#ReplaceLines(do_line_no, end_line_no, replacement)
 
-  return g:sjDoNotRestoreCursor
+  return 1
 endfunction
 
 function! sj#ruby#SplitCachingConstruct()

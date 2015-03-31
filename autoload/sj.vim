@@ -79,6 +79,10 @@ function! sj#PeekCursor()
   return b:cursor_position_stack[-1]
 endfunction
 
+function! sj#SetPeekPos(l, c)
+  let [b:cursor_position_stack[-1][1], b:cursor_position_stack[-1][2]] = [a:l, a:c]
+endfunction
+
 " Text replacement {{{1
 "
 " Vim doesn't seem to have a whole lot of functions to aid in text replacement
