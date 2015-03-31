@@ -319,7 +319,10 @@ function! sj#ruby#SplitBlock()
   let pattern = '\v\{(\s*\|.{-}\|)?\s*(.{-})\s*\}'
 
   if sj#SearchUnderCursor('\v%(\k|!|\-\>|\?|\))\s*\zs'.pattern) <= 0
-    return 0
+    " check if the outside of the block and on the same line
+    if search('\v%(\k|!|\-\>|\?|\))\s*\zs'.pattern, 'cW', line('.')) <= 0
+      return 0
+    endif
   endif
 
   let start = col('.')
@@ -362,7 +365,6 @@ endfunction
 
 function! sj#ruby#JoinBlock()
   let do_pattern = '\<do\>'
-  let after_do = '\(\s*|.*|\s*\)\?$'
   let initial_pos = [line('.'), col('.')]
   let is_called_inside_block = 0
 
@@ -371,7 +373,7 @@ function! sj#ruby#JoinBlock()
   if do_line_no <= 0
     " Search the beginning of the block when inside
     let is_called_inside_block = 1
-    let do_line_no = searchpair(do_pattern, '', '\<end\>', 'bW')
+    let do_line_no = searchpair(do_pattern, '', '\<end\>', 'cbW')
   endif
 
   if do_line_no <= 0
